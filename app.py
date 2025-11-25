@@ -234,6 +234,17 @@ def calculate_bill():
         app.logger.error(f"Error en el cálculo: {e}")
         return jsonify({"error": "Error interno del servidor en el cálculo", "details": str(e)}), 500
 
+# ----------------------------------------------------
+# 📌 ENDPOINT DE PRUEBA RÁPIDA
+# RUTA: /api/test
+# ----------------------------------------------------
+@app.route('/api/test', methods=['GET'])
+def test_route():
+    """
+    Ruta simple para verificar que el servidor está corriendo y las rutas /api/ están registradas.
+    """
+    return jsonify({"status": "ok", "message": "API is running correctly and routes are accessible."}), 200
+
 if __name__ == '__main__':
     # Configuración de puerto para Render (puede ser necesario)
     import os
