@@ -37,7 +37,7 @@ def cargar_tarifas_completas(nombre_fichero):
 # 📌 ENDPOINT: OBTENER DETALLE POR ID
 # RUTA: /tarifas/<tariff_id>
 # ----------------------------------------------------
-@app.route('/tarifas/<tariff_id>', methods=['GET'])
+@app.route('/api/tarifas/<tariff_id>', methods=['GET'])
 def obtener_detalle_tarifa(tariff_id):
     """
     Busca una tarifa por su ID y devuelve sus detalles completos.
@@ -81,7 +81,7 @@ def obtener_detalle_tarifa(tariff_id):
             "message": f"No se encontró ninguna tarifa con el ID: {tariff_id}"
         }), 404
         
-@app.route('/general_costs')
+@app.route('/api/general_costs')
 def obtener_parametros():
     """
     Endpoint que devuelve un JSON con los parámetros generales
@@ -99,7 +99,7 @@ def obtener_parametros():
     # 3. Devolver la lista como un JSON (Código 200 OK)
     return jsonify(params)
 
-@app.route('/tarifas', methods=['GET'])
+@app.route('/api/tarifas', methods=['GET'])
 def obtener_resumen_tarifas():
     """
     Endpoint que devuelve un JSON con el ID, la compañía y el perfil de cada tarifa.
@@ -127,7 +127,7 @@ def obtener_resumen_tarifas():
     # 3. Devolver la lista como un JSON (Código 200 OK)
     return jsonify(resumen_tarifas)
 
-@app.route('/calculate', methods=['POST'])
+@app.route('/api/calculate', methods=['POST'])
 def calculate_bill():
     """
     Endpoint que recibe los datos de la factura y calcula el importe total
