@@ -131,6 +131,21 @@
       }
     },
     {
+      "tariff_id": "Octopus_2",  
+      "company": "Octopus Energy",
+      "profile": "Relax",
+      "description": "Mismos precios las 24 horas",
+      "power_term": {
+        "p1_price_kw_day": 0.095,
+        "p2_price_kw_day": 0.027
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.11900,
+        "p2_price_kwh": 0.11900,
+        "p3_price_kwh": 0.11900
+      }
+    },
+    {
       "tariff_id": "Holaluz_1",
       "company": "Holaluz",
       "profile": "Tarifa Plana (Simulación de Cuota)",
