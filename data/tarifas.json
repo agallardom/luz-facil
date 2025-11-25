@@ -1,0 +1,149 @@
+{
+  "general_costs": {
+    "iva_rate": 0.21,
+    "iva_description": "Impuesto sobre el Valor Añadido (21%) aplicado al total imponible (Potencia + Energía + Impuesto Electricidad + Alquiler).",
+    "electricity_tax_rate": 0.051127,
+    "electricity_tax_description": "Impuesto Especial sobre la Electricidad (5.1127%) aplicado a la suma de los términos de potencia y energía.",
+    "meter_rental_daily": 0.026630,
+    "meter_rental_description": "Coste fijo mensual por el alquiler del equipo de medida (contador). (Aprox. 0,0493 €/día x 30 días)",
+    "social_bonus_financial": 0.012742,
+    "social_bonus_description": "Financiación de bono social."
+  },
+  "tariff_profiles": [
+    {
+      "tariff_id": "Endesa_act",
+      "company": "Endesa",
+      "profile": "Actual",
+      "description": "Mi tarifa actual",
+      "power_term": {
+        "p1_price_kw_day": 0.106413,
+        "p2_price_kw_day": 0.032817
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.201361,
+        "p2_price_kwh": 0,
+        "p3_price_kwh": 0
+      }
+    },
+    {
+      "tariff_id": "Endesa_1",
+      "company": "Endesa",
+      "profile": "One Luz (3 Periodos Fijo)",
+      "description": "Oferta digital con 3 precios fijos para la energía, incentivando el consumo en horas valle. Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.0987,
+        "p2_price_kw_day": 0.0415
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.2250,
+        "p2_price_kwh": 0.1550,
+        "p3_price_kwh": 0.1050
+      }
+    },
+    {
+      "tariff_id": "Endesa_2",
+      "company": "Endesa",
+      "profile": "Tarifa Tempo Happy (Punta/Valle Gratis)",
+      "description": "Permite elegir 2 horas seguidas al día (o un día entero a la semana) de energía gratis. El resto, precio fijo. Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.1050,
+        "p2_price_kw_day": 0.0450
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.2500, 
+        "p2_price_kwh": 0.1600,
+        "p3_price_kwh": 0.1100
+      }
+    },
+    {
+      "tariff_id": "Iberdrola_1",
+      "company": "Iberdrola",
+      "profile": "Plan Online (Precio Fijo 24h)",
+      "description": "Una tarifa con un único precio de energía las 24 horas del día (tarifa plana de energía). Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.1082,
+        "p2_price_kw_day": 0.0466
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.1199,
+        "p2_price_kwh": 0.1199,
+        "p3_price_kwh": 0.1199
+      }
+    },
+    {
+      "tariff_id": "Iberdrola_2",
+      "company": "Iberdrola",
+      "profile": "Plan Ahorro inteligente",
+      "description": "Tarifa con un precio muy bajo en horario súper-valle (madrugada), ideal para recarga de VE. Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.11650,
+        "p2_price_kw_day": 0.23300
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.108192, 
+        "p2_price_kwh": 0.046548, 
+        "p3_price_kwh": 0.0750  
+      }
+    },
+    {
+      "tariff_id": "Naturgy_1",
+      "company": "Naturgy",
+      "profile": "Plan Fijo Franjas (3 Periodos)",
+      "description": "Tarifa con precios fijos distintos para cada periodo (Punta, Llano, Valle), con gran discriminación horaria. Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.1208,
+        "p2_price_kw_day": 0.0439
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.2014,
+        "p2_price_kwh": 0.1322,
+        "p3_price_kwh": 0.0976
+      }
+    },
+    {
+      "tariff_id": "Naturgy_2",
+      "company": "Naturgy",
+      "profile": "Tarifa Plana (Cuota Fija)",
+      "description": "Cuota mensual fija, independientemente del consumo (basado en el consumo histórico). Usamos precio plano en energía y alta potencia para simular el coste. Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.1500,
+        "p2_price_kw_day": 0.0600
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.1250,
+        "p2_price_kwh": 0.1250,
+        "p3_price_kwh": 0.1250
+      }
+    },
+    {
+      "tariff_id": "Octopus_1",  
+      "company": "Octopus Energy",
+      "profile": "Tarifa 3 Periodos (Compromiso Verde)",
+      "description": "Precios fijos competitivos con tres periodos de energía. Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.1100,
+        "p2_price_kw_day": 0.0450
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.1900,
+        "p2_price_kwh": 0.1300,
+        "p3_price_kwh": 0.0900
+      }
+    },
+    {
+      "tariff_id": "Holaluz_1",
+      "company": "Holaluz",
+      "profile": "Tarifa Plana (Simulación de Cuota)",
+      "description": "Modelo de cuota fija mensual. Para la simulación de precios, usamos un término de potencia alto y energía plana. Asume 4kW de potencia P1 y P2.",
+      "power_term": {
+        "p1_price_kw_day": 0.2000,
+        "p2_price_kw_day": 0.0800
+      },
+      "energy_term": {
+        "p1_price_kwh": 0.1350,
+        "p2_price_kwh": 0.1350,
+        "p3_price_kwh": 0.1350
+      }
+    }
+  ]
+}

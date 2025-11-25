@@ -1,3 +1,5 @@
+import json
+import os
 from flask import Flask, request, jsonify
 from flask_cors import CORS # Necesario para permitir llamadas desde el frontend
 
@@ -7,6 +9,123 @@ CORS(app)
 
 # Constante para el cálculo del prorrateo de la cuota fija
 DAYS_IN_MONTH_AVG = 30.42
+
+# Nombre del archivo JSON que contiene las tarifas
+NOMBRE_ARCHIVO = "data/tarifas.json"
+
+def cargar_tarifas_completas(nombre_fichero):
+    """
+    Carga el contenido de un archivo JSON en un diccionario de Python.
+    """
+    try:
+        # 1. Abrir el fichero en modo lectura ('r')
+        # La instrucción 'with' asegura que el fichero se cierra automáticamente.
+        with open(nombre_fichero, 'r', encoding='utf-8') as archivo:
+            # 2. Usar json.load() para leer directamente desde el objeto archivo
+            datos = json.load(archivo)
+            print(f"✅ Archivo '{nombre_fichero}' cargado exitosamente.")
+            return datos
+            
+    except FileNotFoundError:
+        print(f"❌ ERROR: El archivo '{nombre_fichero}' no se encontró en la ruta: {os.getcwd()}")
+        return None
+    except json.JSONDecodeError as e:
+        print(f"❌ ERROR: El archivo '{nombre_fichero}' no es un JSON válido. Error: {e}")
+        return None
+
+# ----------------------------------------------------
+# 📌 ENDPOINT: OBTENER DETALLE POR ID
+# RUTA: /tarifas/<tariff_id>
+# ----------------------------------------------------
+@app.route('/tarifas/<tariff_id>', methods=['GET'])
+def obtener_detalle_tarifa(tariff_id):
+    """
+    Busca una tarifa por su ID y devuelve sus detalles completos.
+    """
+    # Cargar los datos completos
+    datos_completos = cargar_tarifas_completas(NOMBRE_ARCHIVO)
+    
+    # 1. Manejar el error de carga de datos (si el archivo JSON falla)
+    if datos_completos is None:
+        return jsonify({
+            "error": "Error interno del servidor",
+            "message": "No se pudieron cargar los datos de las tarifas."
+        }), 500
+        
+    perfiles = datos_completos.get('tariff_profiles', [])
+
+    # 2. Buscar la tarifa por su ID (uso de expresión generadora 'next')
+    tarifa_encontrada = next(
+        (t for t in perfiles if t.get('tariff_id') == tariff_id), 
+        None
+    )
+    
+    # 3. Construir la respuesta
+    if tarifa_encontrada:
+        company = tarifa_encontrada.get('company', 'N/D')
+        name = tarifa_encontrada.get('profile', 'Tarifa Desconocida')
+        
+        respuesta = {
+            # Esto lo usa tu frontend para la descripción
+            "description": f"{company} - {name}", 
+            # Esto son los datos que necesita el frontend para el cálculo
+            "details": tarifa_encontrada 
+        }
+        return jsonify(respuesta), 200
+    else:
+        # Respuesta 404
+        # 🚨 DEBUGGING: Imprime la ID que no se encontró para confirmar
+        print(f"DEBUG: No se encontró tarifa con ID: '{tariff_id}'")
+        return jsonify({
+            "error": "No encontrado", 
+            "message": f"No se encontró ninguna tarifa con el ID: {tariff_id}"
+        }), 404
+        
+@app.route('/general_costs')
+def obtener_parametros():
+    """
+    Endpoint que devuelve un JSON con los parámetros generales
+    """
+    # 1. Cargar los datos completos
+    datos_completos = cargar_tarifas_completas(NOMBRE_ARCHIVO)
+    
+    if datos_completos is None:
+        # ⭐️ CORRECCIÓN CLAVE: Devolver un JSON de error y el código HTTP 500
+        print("❌ Fallo en la carga de datos. Devolviendo error 500 al cliente.")
+        return jsonify({"error": "No se pudieron cargar los datos de las tarifas. Verifique el archivo JSON y la ruta."}), 500
+        
+    params = datos_completos.get('general_costs', [])
+    
+    # 3. Devolver la lista como un JSON (Código 200 OK)
+    return jsonify(params)
+
+@app.route('/tarifas', methods=['GET'])
+def obtener_resumen_tarifas():
+    """
+    Endpoint que devuelve un JSON con el ID, la compañía y el perfil de cada tarifa.
+    """
+    # 1. Cargar los datos completos
+    datos_completos = cargar_tarifas_completas(NOMBRE_ARCHIVO)
+    
+    if datos_completos is None:
+        # ⭐️ CORRECCIÓN CLAVE: Devolver un JSON de error y el código HTTP 500
+        print("❌ Fallo en la carga de datos. Devolviendo error 500 al cliente.")
+        return jsonify({"error": "No se pudieron cargar los datos de las tarifas. Verifique el archivo JSON y la ruta."}), 500
+        
+    perfiles = datos_completos.get('tariff_profiles', [])
+    
+    # 2. Procesar los datos para obtener el resumen solicitado
+    resumen_tarifas = []
+    for tarifa in perfiles:
+        if all(key in tarifa for key in ['tariff_id', 'company', 'profile']):
+            resumen_tarifas.append({
+                "id": tarifa['tariff_id'],
+                "company": tarifa['company'],
+                "name": tarifa['profile']
+            })
+            
+    # 3. Devolver la lista como un JSON (Código 200 OK)
+    return jsonify(resumen_tarifas)
 
 @app.route('/calculate', methods=['POST'])
 def calculate_bill():

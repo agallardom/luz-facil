@@ -33,6 +33,9 @@
             ring-color: #93c5fd;
             outline: none;
         }
+        .oculto {
+            display: none;
+        }
     </style>
 </head>
 <body class="p-4 sm:p-8">
@@ -50,10 +53,9 @@
         <div class="bg-gray-50 p-4 rounded-lg mb-6 shadow-inner">
             <h2 class="text-xl font-semibold text-gray-800 mb-3">Guardar / Cargar Perfil</h2>
             <div class="flex flex-col sm:flex-row gap-3">
-                <select id="profile-select" class="sm:w-1/3 input-group select">
+                <select id="profile-select" class="sm:w-1/2 input-group select">
                     <option value="">-- Seleccionar Perfil --</option>
                 </select>
-                <input type="text" id="profile-name" placeholder="Nombre del nuevo perfil" class="sm:flex-grow input-group input">
                 <button onclick="loadProfile()" class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition duration-150">Cargar</button>
                 <button onclick="saveProfile()" class="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition duration-150">Guardar</button>
             </div>
@@ -72,42 +74,31 @@
 
                 <!-- Alquiler de Contador -->
                 <div class="input-group">
-                    <label for="meter-rental-daily">Alquiler Contador (€/día)</label>
-                    <input type="number" id="meter-rental-daily" value="0.027" min="0" step="0.001" class="input-group input">
+                    <!--label for="meter-rental-daily">Alquiler Contador (€/día)</label-->
+                    <input type="number" id="meter-rental-daily" value="0.027" min="0" step="0.001" class="oculto">
                 </div>
                 
                 <!-- Cuota Fija Adicional -->
                 <div class="input-group">
                     <label for="fixed-monthly-fee">Cuota Fija Adicional (€/mes)</label>
-                    <input type="number" id="fixed-monthly-fee" value="3.00" min="0" step="0.01" class="input-group input">
+                    <input type="number" id="fixed-monthly-fee" value="0.00" min="0" step="0.01" class="input-group input">
                 </div>
                 
                 <h3 class="text-lg font-semibold text-gray-700 border-t pt-4">Potencia Contratada y Precio</h3>
 
-                <!-- Potencia P1 (Punta/Peak) -->
+                <!-- Potencia -->
                 <div class="flex gap-4">
                     <div class="input-group w-1/2">
                         <label for="contracted-power-p1">Potencia P1 (Punta - kW)</label>
-                        <input type="number" id="contracted-power-p1" value="4.6" min="0" step="0.1" class="input-group input">
+                        <input type="number" id="contracted-power-p1" value="3.45" min="0" step="0.1" class="input-group input">
                     </div>
-                    <div class="input-group w-1/2">
-                        <label for="power-price-daily-p1">Precio P1 (€/kW/día)</label>
-                        <input type="number" id="power-price-daily-p1" value="0.109589" min="0" step="0.000001" class="input-group input">
-                    </div>
-                </div>
-
-                <!-- Potencia P2 (Valle/Off-Peak) -->
-                <div class="flex gap-4">
                     <div class="input-group w-1/2">
                         <label for="contracted-power-p2">Potencia P2 (Valle - kW)</label>
-                        <input type="number" id="contracted-power-p2" value="4.6" min="0" step="0.1" class="input-group input">
+                        <input type="number" id="contracted-power-p2" value="3.45" min="0" step="0.1" class="input-group input">
                     </div>
-                    <div class="input-group w-1/2">
-                        <label for="power-price-daily-p2">Precio P2 (€/kW/día)</label>
-                        <input type="number" id="power-price-daily-p2" value="0.024657" min="0" step="0.000001" class="input-group input">
-                    </div>
+                    <input type="number" id="power-price-daily-p1" value="0.109589" min="0" step="0.000001" class="oculto">
+                    <input type="number" id="power-price-daily-p2" value="0.024657" min="0" step="0.000001" class="oculto">
                 </div>
-
             </div>
 
             <!-- Columna de Consumo y Precios -->
@@ -119,11 +110,11 @@
                     <div class="flex gap-4">
                         <div class="input-group w-1/2">
                             <label for="consumption-punta">Consumo P1 (Punta - kWh)</label>
-                            <input type="number" id="consumption-punta" value="100" min="0" step="1" class="input-group input">
+                            <input type="number" id="consumption-punta" value="202.873" min="0" step="1" class="input-group input">
                         </div>
                         <div class="input-group w-1/2">
-                            <label for="price-punta">Precio P1 (€/kWh)</label>
-                            <input type="number" id="price-punta" value="0.18" min="0" step="0.001" class="input-group input">
+                            <!--label for="price-punta">Precio P1 (€/kWh)</label-->
+                            <input type="number" id="price-punta" value="0.18" min="0" step="0.001" class="oculto">
                         </div>
                     </div>
 
@@ -131,11 +122,11 @@
                     <div class="flex gap-4">
                         <div class="input-group w-1/2">
                             <label for="consumption-llano">Consumo P2 (Llano - kWh)</label>
-                            <input type="number" id="consumption-llano" value="100" min="0" step="1" class="input-group input">
+                            <input type="number" id="consumption-llano" value="0" min="0" step="1" class="input-group input">
                         </div>
                         <div class="input-group w-1/2">
-                            <label for="price-llano">Precio P2 (€/kWh)</label>
-                            <input type="number" id="price-llano" value="0.12" min="0" step="0.001" class="input-group input">
+                            <!--label for="price-llano">Precio P2 (€/kWh)</label-->
+                            <input type="number" id="price-llano" value="0.12" min="0" step="0.001" class="oculto">
                         </div>
                     </div>
 
@@ -143,11 +134,11 @@
                     <div class="flex gap-4">
                         <div class="input-group w-1/2">
                             <label for="consumption-valle">Consumo P3 (Valle - kWh)</label>
-                            <input type="number" id="consumption-valle" value="50" min="0" step="1" class="input-group input">
+                            <input type="number" id="consumption-valle" value="0" min="0" step="1" class="input-group input">
                         </div>
                         <div class="input-group w-1/2">
-                            <label for="price-valle">Precio P3 (€/kWh)</label>
-                            <input type="number" id="price-valle" value="0.08" min="0" step="0.001" class="input-group input">
+                            <!--label for="price-valle">Precio P3 (€/kWh)</label-->
+                            <input type="number" id="price-valle" value="0.08" min="0" step="0.001" class="oculto">
                         </div>
                     </div>
                 </div>
@@ -162,17 +153,17 @@
 
                 <!-- Financiación Bono Social (Nuevo) -->
                 <div class="input-group">
-                    <label for="social-bono-financing-rate">Financiación Bono Social</label>
-                    <input type="number" id="social-bono-financing-rate" value="0.0127" min="0" step="0.00001" class="input-group input">
+                    <!--label for="social-bono-financing-rate">Financiación Bono Social</label-->
+                    <input type="number" id="social-bono-financing-rate" value="0.0127" min="0" step="0.00001" class="oculto">
                 </div>
 
                 <div class="input-group">
-                    <label for="electricity-tax-rate">Impuesto Electricidad (%)</label>
-                    <input type="number" id="electricity-tax-rate" value="5.113" min="0" step="0.001" class="input-group input">
+                    <!--label for="electricity-tax-rate">Impuesto Electricidad (%)</label-->
+                    <input type="number" id="electricity-tax-rate" value="5.113" min="0" step="0.001" class="oculto">
                 </div>
                 <div class="input-group">
-                    <label for="vat-rate">IVA/IGIC (%)</label>
-                    <input type="number" id="vat-rate" value="21" min="0" step="0.1" class="input-group input">
+                    <!--label for="vat-rate">IVA/IGIC (%)</label-->
+                    <input type="number" id="vat-rate" value="21" min="0" step="0.1" class="oculto">
                 </div>
             </div>
         </div>
@@ -207,7 +198,7 @@
                     <h3 class="text-xl font-semibold text-gray-800 mb-2">2. Otros Costes Fijos</h3>
                     <div class="space-y-1">
                         <div class="flex justify-between items-center text-lg">
-                            <span class="text-gray-600">Alquiler Contador (<span id="rental-days-summary">30</span> días):</span>
+                            <span class="text-gray-600">Alquiler Contador (<span id="rental-days-summary">30</span> Eur/día):</span>
                             <span id="meter-rental-display" class="font-mono font-bold text-gray-800">0.00 €</span>
                         </div>
                         <div class="flex justify-between items-center text-lg border-t pt-1">
@@ -284,235 +275,164 @@
         </div>
     </div>
 
-    <!-- Firebase SDKs -->
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
-        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
-        import { getFirestore, doc, addDoc, setDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
-
-        // Establecer el nivel de registro de Firestore a Debug
-        setLogLevel('debug');
-
-        // Variables globales (accesibles a window)
-        window.db = null;
-        window.auth = null;
-        window.userId = null;
-        window.profiles = [];
-
-        // Datos del entorno de Canvas (MANDATORIO)
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
-        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
-        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
-
-        /**
-         * Inicializa Firebase y autentica al usuario.
-         */
-        async function initFirebase() {
-            try {
-                // FIX: Usar el elemento específico para mostrar el estado de autenticación
-                const userIdDisplayEl = document.getElementById('user-id-display');
-                
-                if (Object.keys(firebaseConfig).length === 0) {
-                    console.error("Firebase Config not available.");
-                    if (userIdDisplayEl) userIdDisplayEl.textContent = "ID de Usuario: ERROR: Configuración de Firebase no disponible.";
-                    return;
-                }
-                const app = initializeApp(firebaseConfig);
-                window.db = getFirestore(app);
-                window.auth = getAuth(app);
-
-                // FIX: Cambiado de 'auth-status' a 'user-id-display' para evitar sobrescribir elementos hijos.
-                if (userIdDisplayEl) {
-                    userIdDisplayEl.textContent = 'ID de Usuario: Autenticando...';
-                }
-
-                // Autenticación usando el token personalizado si está disponible, sino de forma anónima
-                if (initialAuthToken) {
-                    await signInWithCustomToken(window.auth, initialAuthToken);
-                } else {
-                    await signInAnonymously(window.auth);
-                }
-
-                // Listener para el estado de autenticación
-                onAuthStateChanged(window.auth, (user) => {
-                    // Añadir una comprobación de nulidad dentro del listener también por seguridad
-                    const displayEl = document.getElementById('user-id-display');
-                    if (!displayEl) return;
-                    
-                    if (user) {
-                        window.userId = user.uid;
-                        displayEl.textContent = `ID de Usuario: ${window.userId}`;
-                        // Una vez autenticado, cargamos los perfiles
-                        loadProfilesListener();
-                    } else {
-                        displayEl.textContent = 'ID de Usuario: No autenticado';
-                        window.userId = null;
-                    }
-                });
-
-            } catch (error) {
-                console.error("Error al inicializar o autenticar Firebase:", error);
-                // FIX: Cambiado de 'auth-status' a 'user-id-display'
-                const displayEl = document.getElementById('user-id-display');
-                if (displayEl) displayEl.textContent = `ID de Usuario: ERROR: Fallo en Auth. Revise consola.`;
-            }
-        }
-
-        /**
-         * Escucha los cambios en la colección de perfiles de simulación (públicos).
-         */
-        function loadProfilesListener() {
-            if (!window.db || !window.userId) return;
-
-            // Ruta de la colección para datos públicos compartidos
-            const collectionPath = `artifacts/${appId}/public/data/bill_profiles`;
-            const profilesCol = collection(window.db, collectionPath);
-            const q = query(profilesCol);
-
-            onSnapshot(q, (snapshot) => {
-                window.profiles = [];
-                snapshot.forEach((doc) => {
-                    window.profiles.push({ id: doc.id, ...doc.data() });
-                });
-                renderProfileSelect();
-                document.getElementById('load-save-status').textContent = `Perfiles cargados: ${window.profiles.length}`;
-            }, (error) => {
-                console.error("Error al escuchar perfiles:", error);
-                showModal('Error de Carga', 'No se pudieron cargar los perfiles de simulación. Revise la consola.');
-            });
-        }
-
-        /**
-         * Renderiza las opciones del select de perfiles.
-         */
-        function renderProfileSelect() {
-            const selectEl = document.getElementById('profile-select');
-            selectEl.innerHTML = '<option value="">-- Seleccionar Perfil --</option>';
-
-            window.profiles.forEach(profile => {
-                const option = document.createElement('option');
-                option.value = profile.id;
-                option.textContent = profile.name || 'Perfil sin nombre';
-                selectEl.appendChild(option);
-            });
-        }
-
-        /**
-         * Guarda el perfil de simulación actual en Firestore.
-         */
-        window.saveProfile = async function() {
-            if (!window.db || !window.userId) {
-                showModal('Error de Autenticación', 'Debe estar autenticado para guardar perfiles.');
-                return;
-            }
-
-            const profileNameInput = document.getElementById('profile-name');
-            const name = profileNameInput.value.trim();
-
-            if (!name) {
-                showModal('Nombre Requerido', 'Por favor, ingrese un nombre para guardar el perfil.');
-                return;
-            }
-
-            // Recoger todos los datos del formulario (Actualizado v4)
-            const data = {
-                name: name,
-                billingDays: parseFloat(document.getElementById('billing-days').value) || 30,
-                meterRentalDaily: parseFloat(document.getElementById('meter-rental-daily').value) || 0,
-                fixedMonthlyFee: parseFloat(document.getElementById('fixed-monthly-fee').value) || 0,
-                
-                contractedPowerP1: parseFloat(document.getElementById('contracted-power-p1').value) || 0,
-                powerPriceDailyP1: parseFloat(document.getElementById('power-price-daily-p1').value) || 0,
-                contractedPowerP2: parseFloat(document.getElementById('contracted-power-p2').value) || 0,
-                powerPriceDailyP2: parseFloat(document.getElementById('power-price-daily-p2').value) || 0,
-                
-                consumptionPunta: parseFloat(document.getElementById('consumption-punta').value) || 0,
-                pricePunta: parseFloat(document.getElementById('price-punta').value) || 0,
-                consumptionLlano: parseFloat(document.getElementById('consumption-llano').value) || 0,
-                priceLlano: parseFloat(document.getElementById('price-llano').value) || 0,
-                consumptionValle: parseFloat(document.getElementById('consumption-valle').value) || 0,
-                priceValle: parseFloat(document.getElementById('price-valle').value) || 0,
-
-                socialBonoDiscountRate: parseFloat(document.getElementById('social-bono-discount-rate').value) || 0,
-                socialBonoFinancingRate: parseFloat(document.getElementById('social-bono-financing-rate').value) || 0, // Nuevo
-                
-                electricityTaxRate: parseFloat(document.getElementById('electricity-tax-rate').value) || 0,
-                vatRate: parseFloat(document.getElementById('vat-rate').value) || 0,
-                createdBy: window.userId,
-                createdAt: new Date().toISOString()
-            };
-
-            try {
-                const collectionPath = `artifacts/${appId}/public/data/bill_profiles`;
-                // Intenta encontrar un perfil existente con el mismo nombre y actualizarlo
-                const existingProfile = window.profiles.find(p => p.name === name);
-
-                if (existingProfile) {
-                    const docRef = doc(window.db, collectionPath, existingProfile.id);
-                    await setDoc(docRef, data, { merge: true });
-                    document.getElementById('load-save-status').textContent = `Perfil "${name}" actualizado.`;
-                } else {
-                    await addDoc(collection(window.db, collectionPath), data);
-                    document.getElementById('load-save-status').textContent = `Perfil "${name}" guardado exitosamente.`;
-                }
-                profileNameInput.value = ''; // Limpiar el nombre después de guardar
-            } catch (error) {
-                console.error("Error al guardar perfil:", error);
-                showModal('Error al Guardar', 'No se pudo guardar el perfil. Revise la consola.');
-            }
-        }
-
-        /**
-         * Carga el perfil de simulación seleccionado.
-         */
-        window.loadProfile = function() {
-            const selectEl = document.getElementById('profile-select');
-            const profileId = selectEl.value;
-
-            if (!profileId) {
-                showModal('Selección Requerida', 'Por favor, seleccione un perfil para cargar.');
-                return;
-            }
-
-            const profile = window.profiles.find(p => p.id === profileId);
-
-            if (profile) {
-                // Rellenar todos los campos del formulario (Actualizado v4)
-                document.getElementById('billing-days').value = profile.billingDays || 30;
-                document.getElementById('meter-rental-daily').value = profile.meterRentalDaily || 0;
-                document.getElementById('fixed-monthly-fee').value = profile.fixedMonthlyFee || 0;
-
-                document.getElementById('contracted-power-p1').value = profile.contractedPowerP1 || 0;
-                document.getElementById('power-price-daily-p1').value = profile.powerPriceDailyP1 || 0;
-                document.getElementById('contracted-power-p2').value = profile.contractedPowerP2 || 0;
-                document.getElementById('power-price-daily-p2').value = profile.powerPriceDailyP2 || 0;
-                
-                document.getElementById('consumption-punta').value = profile.consumptionPunta || 0;
-                document.getElementById('price-punta').value = profile.pricePunta || 0;
-                document.getElementById('consumption-llano').value = profile.consumptionLlano || 0;
-                document.getElementById('price-llano').value = profile.priceLlano || 0;
-                document.getElementById('consumption-valle').value = profile.consumptionValle || 0;
-                document.getElementById('price-valle').value = profile.priceValle || 0;
-                
-                document.getElementById('social-bono-discount-rate').value = profile.socialBonoDiscountRate || 0;
-                document.getElementById('social-bono-financing-rate').value = profile.socialBonoFinancingRate || 0; // Nuevo
-
-                document.getElementById('electricity-tax-rate').value = profile.electricityTaxRate || 0;
-                document.getElementById('vat-rate').value = profile.vatRate || 0;
-
-                document.getElementById('load-save-status').textContent = `Perfil "${profile.name}" cargado.`;
-                document.getElementById('profile-name').value = profile.name;
-            } else {
-                showModal('Error de Carga', 'Perfil no encontrado.');
-            }
-        }
-
-        // Inicializar Firebase al cargar la página
-        initFirebase();
-    </script>
 
     <script>
+        // Definición de la URL del endpoint de Flask para obtener la lista de tarifas
+        const API_URL_BASE = 'https://luz_facil.onrender.com/api/';
+        const API_URL = API_URL_BASE + 'tarifas';
+        const API_URL_PARAMS = API_URL_BASE + 'general_costs';
+
+        /**
+         * 1. Obtiene la lista de tarifas desde el endpoint de Flask.
+         * 2. Rellena el elemento <select> con las opciones de tarifa.
+         */
+        async function loadTariffOptions() {
+            const selectElement = document.getElementById('profile-select');
+
+            // Mantenemos la opción por defecto (Seleccionar Perfil) y eliminamos cualquier otra
+            selectElement.innerHTML = '<option value="">-- Seleccionar Perfil --</option>';
+
+            try {
+                // 1. Realizar la petición GET al endpoint de Flask
+                const response = await fetch(API_URL);
+                
+                // Manejar errores HTTP (e.g., 404, 500)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const tariffs = await response.json(); // Convertir la respuesta a JSON (es una lista)
+                
+                // 2. Iterar sobre la lista de tarifas y crear los <option>
+                tariffs.forEach(tariff => {
+                    // Creamos el elemento <option>
+                    const option = document.createElement('option');
+                    
+                    // Valor (value): Usamos el ID (p. ej., END_ONE_001)
+                    option.value = tariff.id; 
+                    
+                    // Texto visible: Usamos Company - Name (p. ej., Endesa - One Luz (3 Periodos Fijo))
+                    option.textContent = `${tariff.company} - ${tariff.name}`;
+                    
+                    // Añadir la opción al select
+                    selectElement.appendChild(option);
+                });
+
+                console.log(`✅ ${tariffs.length} tarifas cargadas en el select.`);
+
+            } catch (error) {
+                console.error('❌ Error al cargar las tarifas:', error);
+                // Opcional: Mostrar un mensaje de error en la UI
+                selectElement.innerHTML += '<option value="" disabled>Error al cargar las tarifas</option>';
+            }
+
+            try {
+                // 1. Realizar la petición GET al endpoint de Flask
+                const response = await fetch(API_URL_PARAMS);
+                
+                // Manejar errores HTTP (e.g., 404, 500)
+                if (!response.ok) {
+                    throw new Error(`HTTP error! Status: ${response.status}`);
+                }
+
+                const params = await response.json(); // Convertir la respuesta a JSON (es una lista)
+                                // Ejemplo de visualización de los datos de potencia en la consola:
+                const p1 = params.iva_rate;
+                const p3 = params.meter_rental_daily;
+                
+                console.log('--- Parámetros  ---');
+                console.log(`IVA: ${p1}`);
+                console.log(`Impuesto energía: ${ params.electricity_tax_rate}`);
+                console.log(`Alquiler contador por día: ${p3}`);
+                console.log(`Financiación bono social: ${params.social_bonus_financial}`);
+                console.log('---------------------------------');
+
+                console.log(`✅ Parámetros cargados correctamente.`);
+                
+                document.getElementById('vat-rate').value = params.iva_rate * 100;
+                document.getElementById('electricity-tax-rate').value = params.electricity_tax_rate * 100;
+                document.getElementById('meter-rental-daily').value = params.meter_rental_daily;
+                document.getElementById('social-bono-financing-rate').value = params.social_bonus_financial;
+                
+                
+                
+
+            } catch (error) {
+                console.error('❌ Error al cargar los parámetrso:', error);
+                // Opcional: Mostrar un mensaje de error en la UI
+                selectElement.innerHTML += '<option value="" disabled>Error al cargar los parámetros </option>';
+            }            
+
+        }
+
+        /**
+         * Obtiene el ID seleccionado en el menú y llama al endpoint de Flask 
+         * para obtener los detalles completos de esa tarifa.
+         */
+        async function loadProfile() {
+            // 1. Obtener el ID seleccionado
+            const selectElement = document.getElementById('profile-select');
+            const selectedId = selectElement.value; 
+
+            // 2. Verificar que se haya seleccionado algo
+            if (!selectedId) {
+                alert('Por favor, selecciona una tarifa para cargar.');
+                return;
+            }
+
+            // 3. Construir la URL del endpoint dinámico (ej: /tarifas/END_ONE_001)
+            const detailURL = `${API_URL}/${selectedId}`;
+            
+            console.log(`🔎 Petición a: ${detailURL}`);
+
+            try {
+                // 4. Realizar la petición GET
+                const response = await fetch(detailURL);
+                
+                // Manejar respuesta no exitosa (ej: 404 Not Found, 500 Internal Server Error)
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(`Error ${response.status}: ${errorData.message}`);
+                }
+
+                const data = await response.json(); // Data contiene {description, details}
+                
+                // 5. Procesar los datos cargados
+                const tariffDetails = data.details;
+
+                console.log(`✅ Datos de la tarifa cargados exitosamente: ${data.description}`);
+                
+                // ⭐️ EJEMPLO DE USO DE LOS DATOS CARGADOS:
+                // Aquí es donde usarías los datos para llenar otros campos de tu formulario
+                // (por ejemplo, los campos de potencia contratada, precios por kWh, etc.)
+                
+                // Ejemplo de visualización de los datos de potencia en la consola:
+                console.log('--- Datos Clave de la Tarifa ---');
+                console.log(`Potencia P1 diaria (€/kW·día): ${tariffDetails.power_term.p1_price_kw_day.toFixed(5)}`);
+                console.log(`Potencia P1 diaria (€/kW·día): ${tariffDetails.power_term.p2_price_kw_day.toFixed(5)}`);
+                console.log(`Energía P1 (Punta) (€/kWh): ${tariffDetails.energy_term.p1_price_kwh.toFixed(5)}`);
+                console.log(`Energía P2 (Punta) (€/kWh): ${tariffDetails.energy_term.p2_price_kwh.toFixed(5)}`);
+                console.log(`Energía P3 (Punta) (€/kWh): ${tariffDetails.energy_term.p3_price_kwh.toFixed(5)}`);
+                console.log('---------------------------------');
+                
+                document.getElementById('power-price-daily-p1').value = tariffDetails.power_term.p1_price_kw_day.toFixed(5);
+                document.getElementById('power-price-daily-p2').value = tariffDetails.power_term.p2_price_kw_day.toFixed(5);
+
+                document.getElementById('price-punta').value = tariffDetails.energy_term.p1_price_kwh.toFixed(5);
+                document.getElementById('price-llano').value = tariffDetails.energy_term.p2_price_kwh.toFixed(5);
+                document.getElementById('price-valle').value = tariffDetails.energy_term.p3_price_kwh.toFixed(5);
+                
+            } catch (error) {
+                console.error('❌ Error al obtener los detalles de la tarifa:', error);
+                alert(`No se pudo cargar la tarifa: ${error.message}`);
+            }
+        }
+
+
+        // 3. Llamar a la función cuando la página esté completamente cargada
+        document.addEventListener('DOMContentLoaded', loadTariffOptions);        
+        
+        
         /**
          * Muestra el modal de mensajes/errores.
          * @param {string} title Título del modal.
@@ -644,7 +564,7 @@
 
             // Actualizaciones del resumen y totales
             document.getElementById('billing-days-summary').textContent = billingDays.toFixed(0);
-            document.getElementById('rental-days-summary').textContent = billingDays.toFixed(0);
+            document.getElementById('rental-days-summary').textContent = billingDays.toFixed(0) + ' x ' + meterRentalDaily.toFixed(5);
             document.getElementById('total-consumption-display').textContent = totalConsumption.toFixed(0);
             document.getElementById('total-bill-display').textContent = totalBill.toFixed(2) + ' €';
             document.getElementById('total-bill-final-display').textContent = totalBill.toFixed(2) + ' €';
@@ -666,7 +586,7 @@
             document.getElementById('social-bono-discount-display').textContent = '-' + socialBonoDiscount.toFixed(2) + ' €';
 
             // Financiación Bono Social (Cargo)
-            document.getElementById('financing-rate-display').textContent = socialBonoFinancingRate.toFixed(5);
+            document.getElementById('financing-rate-display').textContent = billingDays.toFixed(0) + ' x '  + socialBonoFinancingRate.toFixed(5);
             document.getElementById('social-bono-financing-display').textContent = socialBonoFinancingCost.toFixed(2) + ' €';
 
             // Impuestos
