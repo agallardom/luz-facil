@@ -1,0 +1,17 @@
+version: '3.8'
+
+services:
+  flask_api:
+    # Construye la imagen usando el Dockerfile en el directorio actual
+    build: .
+    # Mapea el puerto local 5000 al puerto expuesto en el contenedor (8000 por defecto de Gunicorn)
+    # Así accedes a la API en http://localhost:5000
+    ports:
+      - "5000:8000"
+    # Monta el código fuente (opcional, pero ayuda al desarrollo local)
+    volumes:
+      - ./app.py:/usr/src/app/app.py
+      - ./requirements.txt:/usr/src/app/requirements.txt
+    environment:
+      # Define la variable PORT por defecto para desarrollo local
+      PORT: 8000

@@ -1,0 +1,682 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Facturas de Luz</title>
+    <!-- Carga de Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Carga de la fuente Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            background-color: #f7f7f7;
+        }
+        .input-group label {
+            display: block;
+            margin-bottom: 4px;
+            font-weight: 600;
+            color: #374151;
+        }
+        .input-group input, .input-group select {
+            width: 100%;
+            padding: 8px 12px;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s;
+        }
+        .input-group input:focus, .input-group select:focus {
+            border-color: #3b82f6;
+            ring: 4px;
+            ring-color: #93c5fd;
+            outline: none;
+        }
+    </style>
+</head>
+<body class="p-4 sm:p-8">
+    <div id="app" class="max-w-4xl mx-auto bg-white rounded-xl shadow-2xl p-6 sm:p-10">
+        <h1 class="text-3xl font-bold text-gray-900 mb-6 border-b pb-2">
+            💡 Simulador de Factura Eléctrica (Multi-Periodo) - v4
+        </h1>
+
+        <div id="auth-status" class="text-xs text-gray-500 mb-4 flex justify-between items-center">
+            <span id="user-id-display">ID de Usuario: Cargando...</span>
+            <span id="load-save-status" class="text-green-600"></span>
+        </div>
+
+        <!-- Sección de Perfiles y Carga/Guardado -->
+        <div class="bg-gray-50 p-4 rounded-lg mb-6 shadow-inner">
+            <h2 class="text-xl font-semibold text-gray-800 mb-3">Guardar / Cargar Perfil</h2>
+            <div class="flex flex-col sm:flex-row gap-3">
+                <select id="profile-select" class="sm:w-1/3 input-group select">
+                    <option value="">-- Seleccionar Perfil --</option>
+                </select>
+                <input type="text" id="profile-name" placeholder="Nombre del nuevo perfil" class="sm:flex-grow input-group input">
+                <button onclick="loadProfile()" class="bg-blue-600 text-white p-2 rounded-lg hover:bg-blue-700 transition duration-150">Cargar</button>
+                <button onclick="saveProfile()" class="bg-green-600 text-white p-2 rounded-lg hover:bg-green-700 transition duration-150">Guardar</button>
+            </div>
+        </div>
+
+        <!-- Formulario de Simulación -->
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            <!-- Columna de Datos de la Tarifa y Potencia -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-semibold text-blue-700 border-b pb-2">1. Datos Fijos y Potencia (2 Periodos)</h2>
+
+                <div class="input-group">
+                    <label for="billing-days">Días de Facturación (Días)</label>
+                    <input type="number" id="billing-days" value="30" min="1" class="input-group input">
+                </div>
+
+                <!-- Alquiler de Contador -->
+                <div class="input-group">
+                    <label for="meter-rental-daily">Alquiler Contador (€/día)</label>
+                    <input type="number" id="meter-rental-daily" value="0.027" min="0" step="0.001" class="input-group input">
+                </div>
+                
+                <!-- Cuota Fija Adicional -->
+                <div class="input-group">
+                    <label for="fixed-monthly-fee">Cuota Fija Adicional (€/mes)</label>
+                    <input type="number" id="fixed-monthly-fee" value="3.00" min="0" step="0.01" class="input-group input">
+                </div>
+                
+                <h3 class="text-lg font-semibold text-gray-700 border-t pt-4">Potencia Contratada y Precio</h3>
+
+                <!-- Potencia P1 (Punta/Peak) -->
+                <div class="flex gap-4">
+                    <div class="input-group w-1/2">
+                        <label for="contracted-power-p1">Potencia P1 (Punta - kW)</label>
+                        <input type="number" id="contracted-power-p1" value="4.6" min="0" step="0.1" class="input-group input">
+                    </div>
+                    <div class="input-group w-1/2">
+                        <label for="power-price-daily-p1">Precio P1 (€/kW/día)</label>
+                        <input type="number" id="power-price-daily-p1" value="0.109589" min="0" step="0.000001" class="input-group input">
+                    </div>
+                </div>
+
+                <!-- Potencia P2 (Valle/Off-Peak) -->
+                <div class="flex gap-4">
+                    <div class="input-group w-1/2">
+                        <label for="contracted-power-p2">Potencia P2 (Valle - kW)</label>
+                        <input type="number" id="contracted-power-p2" value="4.6" min="0" step="0.1" class="input-group input">
+                    </div>
+                    <div class="input-group w-1/2">
+                        <label for="power-price-daily-p2">Precio P2 (€/kW/día)</label>
+                        <input type="number" id="power-price-daily-p2" value="0.024657" min="0" step="0.000001" class="input-group input">
+                    </div>
+                </div>
+
+            </div>
+
+            <!-- Columna de Consumo y Precios -->
+            <div class="space-y-6">
+                <h2 class="text-xl font-semibold text-blue-700 border-b pb-2">2. Consumo y Precios (€/kWh) - 3 Periodos</h2>
+
+                <div class="space-y-6">
+                    <!-- Periodo P1 (Punta - Peak) -->
+                    <div class="flex gap-4">
+                        <div class="input-group w-1/2">
+                            <label for="consumption-punta">Consumo P1 (Punta - kWh)</label>
+                            <input type="number" id="consumption-punta" value="100" min="0" step="1" class="input-group input">
+                        </div>
+                        <div class="input-group w-1/2">
+                            <label for="price-punta">Precio P1 (€/kWh)</label>
+                            <input type="number" id="price-punta" value="0.18" min="0" step="0.001" class="input-group input">
+                        </div>
+                    </div>
+
+                    <!-- Periodo P2 (Llano - Shoulder) -->
+                    <div class="flex gap-4">
+                        <div class="input-group w-1/2">
+                            <label for="consumption-llano">Consumo P2 (Llano - kWh)</label>
+                            <input type="number" id="consumption-llano" value="100" min="0" step="1" class="input-group input">
+                        </div>
+                        <div class="input-group w-1/2">
+                            <label for="price-llano">Precio P2 (€/kWh)</label>
+                            <input type="number" id="price-llano" value="0.12" min="0" step="0.001" class="input-group input">
+                        </div>
+                    </div>
+
+                    <!-- Periodo P3 (Valle - Off-Peak) -->
+                    <div class="flex gap-4">
+                        <div class="input-group w-1/2">
+                            <label for="consumption-valle">Consumo P3 (Valle - kWh)</label>
+                            <input type="number" id="consumption-valle" value="50" min="0" step="1" class="input-group input">
+                        </div>
+                        <div class="input-group w-1/2">
+                            <label for="price-valle">Precio P3 (€/kWh)</label>
+                            <input type="number" id="price-valle" value="0.08" min="0" step="0.001" class="input-group input">
+                        </div>
+                    </div>
+                </div>
+
+                <h3 class="text-lg font-semibold text-gray-700 border-t pt-4">3. Descuentos e Impuestos</h3>
+                
+                <!-- Bono Social Descuento -->
+                <div class="input-group">
+                    <label for="social-bono-discount-rate">Bono Social / Descuento (%)</label>
+                    <input type="number" id="social-bono-discount-rate" value="0" min="0" max="100" step="1" class="input-group input">
+                </div>
+
+                <!-- Financiación Bono Social (Nuevo) -->
+                <div class="input-group">
+                    <label for="social-bono-financing-rate">Financiación Bono Social</label>
+                    <input type="number" id="social-bono-financing-rate" value="0.0127" min="0" step="0.00001" class="input-group input">
+                </div>
+
+                <div class="input-group">
+                    <label for="electricity-tax-rate">Impuesto Electricidad (%)</label>
+                    <input type="number" id="electricity-tax-rate" value="5.113" min="0" step="0.001" class="input-group input">
+                </div>
+                <div class="input-group">
+                    <label for="vat-rate">IVA/IGIC (%)</label>
+                    <input type="number" id="vat-rate" value="21" min="0" step="0.1" class="input-group input">
+                </div>
+            </div>
+        </div>
+
+        <button onclick="calculateBill()" class="w-full mt-8 py-3 bg-red-600 text-white text-lg font-bold rounded-xl shadow-lg hover:bg-red-700 transition duration-150 transform hover:scale-[1.01] active:scale-95">
+            CALCULAR FACTURA SIMULADA
+        </button>
+
+        <!-- Resultados de la Simulación -->
+        <div id="results-section" class="mt-8 pt-6 border-t-2 border-dashed border-gray-300 hidden">
+            <h2 class="text-2xl font-bold text-red-600 mb-4">Resultado de la Simulación</h2>
+
+            <div class="bg-red-50 border-l-4 border-red-500 p-4 mb-6 rounded-md">
+                <p class="text-2xl font-bold text-red-700">TOTAL ESTIMADO A PAGAR: <span id="total-bill-display">0.00 €</span></p>
+                <p class="text-sm text-red-600 mt-1">Estimación para <span id="billing-days-summary">30</span> días de facturación.</p>
+            </div>
+
+            <!-- Detalles de la Factura -->
+            <div class="space-y-4">
+                <div class="bg-gray-100 p-4 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">1. Término de Potencia (Fijo)</h3>
+                    <div id="power-breakdown">
+                        <!-- Desglose de potencia P1 y P2 -->
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold border-t mt-2 pt-2">
+                        <span class="text-gray-700">Subtotal Potencia:</span>
+                        <span id="power-term-display" class="font-mono text-gray-800">0.00 €</span>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-4 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">2. Otros Costes Fijos</h3>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center text-lg">
+                            <span class="text-gray-600">Alquiler Contador (<span id="rental-days-summary">30</span> días):</span>
+                            <span id="meter-rental-display" class="font-mono font-bold text-gray-800">0.00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center text-lg border-t pt-1">
+                            <span class="text-gray-600">Cuota Fija Adicional (Prorrateada):</span>
+                            <span id="fixed-fee-display" class="font-mono font-bold text-gray-800">0.00 €</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-100 p-4 rounded-lg shadow">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">3. Término de Energía (Variable)</h3>
+                    <div id="energy-breakdown">
+                        <!-- Detalles de consumo por periodos se insertarán aquí -->
+                    </div>
+                    <div class="flex justify-between items-center text-lg font-bold border-t mt-2 pt-2">
+                        <span class="text-gray-700">Subtotal Consumo (<span id="total-consumption-display">0</span> kWh):</span>
+                        <span id="energy-term-display" class="font-mono text-gray-800">0.00 €</span>
+                    </div>
+                </div>
+                
+                <!-- Sección de Descuentos -->
+                <div class="bg-red-100 p-4 rounded-lg shadow border-2 border-red-300">
+                    <h3 class="text-xl font-semibold text-red-700 mb-2">4. Descuentos Aplicados</h3>
+                    <div class="flex justify-between items-center text-lg font-bold">
+                        <span class="text-red-600">Bono Social Descuento (<span id="social-bono-rate-display">0</span>% sobre Base):</span>
+                        <span id="social-bono-discount-display" class="font-mono text-red-700">-0.00 €</span>
+                    </div>
+                </div>
+
+                <!-- Sección de Cargos (Incluye Financiación BS) -->
+                <div class="bg-yellow-50 p-4 rounded-lg shadow border-2 border-yellow-300">
+                    <h3 class="text-xl font-semibold text-gray-800 mb-2">5. Cargos Obligatorios e Impuestos</h3>
+                    <div class="space-y-1">
+                        <div class="flex justify-between items-center text-md font-bold text-blue-800">
+                            <span class="text-blue-700">Financiación Bono Social (<span id="financing-rate-display">0</span> €/kWh):</span>
+                            <span id="social-bono-financing-display" class="font-mono font-bold">0.00 €</span>
+                        </div>
+                        <hr class="border-gray-300 my-1"/>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600 font-bold">Base Imponible (Fijos + Energía + Financiación - Descuento):</span>
+                            <span id="base-imponible-display" class="font-mono font-medium">0.00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">Impuesto de Electricidad (<span id="elec-tax-rate-display">5.113</span>%):</span>
+                            <span id="electricity-tax-display" class="font-mono font-medium">0.00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center border-t mt-1 pt-1">
+                            <span class="text-gray-600">Subtotal con Impuesto Electricidad:</span>
+                            <span id="subtotal-tax-base-display" class="font-mono font-medium">0.00 €</span>
+                        </div>
+                        <div class="flex justify-between items-center">
+                            <span class="text-gray-600">IVA/IGIC (<span id="vat-rate-display">21</span>%):</span>
+                            <span id="vat-display" class="font-mono font-medium text-green-700">0.00 €</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="bg-gray-900 text-white p-4 rounded-lg mt-4 shadow-xl">
+                    <div class="flex justify-between items-center">
+                        <span class="text-xl font-bold">TOTAL FACTURA (Impuestos Incluidos)</span>
+                        <span id="total-bill-final-display" class="text-3xl font-extrabold font-mono">0.00 €</span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+         <!-- Modal para mensajes/errores (NO USAR alert()) -->
+        <div id="message-modal" class="fixed inset-0 bg-gray-600 bg-opacity-75 hidden items-center justify-center p-4 z-50">
+            <div class="bg-white rounded-lg shadow-xl p-6 max-w-sm w-full">
+                <h3 id="modal-title" class="text-xl font-bold mb-4 text-red-600">Error</h3>
+                <p id="modal-message" class="text-gray-700 mb-6">Mensaje de error.</p>
+                <button onclick="closeModal()" class="w-full bg-blue-600 text-white py-2 rounded-lg hover:bg-blue-700">Cerrar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Firebase SDKs -->
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-app.js";
+        import { getAuth, signInAnonymously, signInWithCustomToken, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-auth.js";
+        import { getFirestore, doc, addDoc, setDoc, onSnapshot, collection, query } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+        import { setLogLevel } from "https://www.gstatic.com/firebasejs/11.6.1/firebase-firestore.js";
+
+        // Establecer el nivel de registro de Firestore a Debug
+        setLogLevel('debug');
+
+        // Variables globales (accesibles a window)
+        window.db = null;
+        window.auth = null;
+        window.userId = null;
+        window.profiles = [];
+
+        // Datos del entorno de Canvas (MANDATORIO)
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'default-app-id';
+        const firebaseConfig = JSON.parse(typeof __firebase_config !== 'undefined' ? __firebase_config : '{}');
+        const initialAuthToken = typeof __initial_auth_token !== 'undefined' ? __initial_auth_token : null;
+
+        /**
+         * Inicializa Firebase y autentica al usuario.
+         */
+        async function initFirebase() {
+            try {
+                // FIX: Usar el elemento específico para mostrar el estado de autenticación
+                const userIdDisplayEl = document.getElementById('user-id-display');
+                
+                if (Object.keys(firebaseConfig).length === 0) {
+                    console.error("Firebase Config not available.");
+                    if (userIdDisplayEl) userIdDisplayEl.textContent = "ID de Usuario: ERROR: Configuración de Firebase no disponible.";
+                    return;
+                }
+                const app = initializeApp(firebaseConfig);
+                window.db = getFirestore(app);
+                window.auth = getAuth(app);
+
+                // FIX: Cambiado de 'auth-status' a 'user-id-display' para evitar sobrescribir elementos hijos.
+                if (userIdDisplayEl) {
+                    userIdDisplayEl.textContent = 'ID de Usuario: Autenticando...';
+                }
+
+                // Autenticación usando el token personalizado si está disponible, sino de forma anónima
+                if (initialAuthToken) {
+                    await signInWithCustomToken(window.auth, initialAuthToken);
+                } else {
+                    await signInAnonymously(window.auth);
+                }
+
+                // Listener para el estado de autenticación
+                onAuthStateChanged(window.auth, (user) => {
+                    // Añadir una comprobación de nulidad dentro del listener también por seguridad
+                    const displayEl = document.getElementById('user-id-display');
+                    if (!displayEl) return;
+                    
+                    if (user) {
+                        window.userId = user.uid;
+                        displayEl.textContent = `ID de Usuario: ${window.userId}`;
+                        // Una vez autenticado, cargamos los perfiles
+                        loadProfilesListener();
+                    } else {
+                        displayEl.textContent = 'ID de Usuario: No autenticado';
+                        window.userId = null;
+                    }
+                });
+
+            } catch (error) {
+                console.error("Error al inicializar o autenticar Firebase:", error);
+                // FIX: Cambiado de 'auth-status' a 'user-id-display'
+                const displayEl = document.getElementById('user-id-display');
+                if (displayEl) displayEl.textContent = `ID de Usuario: ERROR: Fallo en Auth. Revise consola.`;
+            }
+        }
+
+        /**
+         * Escucha los cambios en la colección de perfiles de simulación (públicos).
+         */
+        function loadProfilesListener() {
+            if (!window.db || !window.userId) return;
+
+            // Ruta de la colección para datos públicos compartidos
+            const collectionPath = `artifacts/${appId}/public/data/bill_profiles`;
+            const profilesCol = collection(window.db, collectionPath);
+            const q = query(profilesCol);
+
+            onSnapshot(q, (snapshot) => {
+                window.profiles = [];
+                snapshot.forEach((doc) => {
+                    window.profiles.push({ id: doc.id, ...doc.data() });
+                });
+                renderProfileSelect();
+                document.getElementById('load-save-status').textContent = `Perfiles cargados: ${window.profiles.length}`;
+            }, (error) => {
+                console.error("Error al escuchar perfiles:", error);
+                showModal('Error de Carga', 'No se pudieron cargar los perfiles de simulación. Revise la consola.');
+            });
+        }
+
+        /**
+         * Renderiza las opciones del select de perfiles.
+         */
+        function renderProfileSelect() {
+            const selectEl = document.getElementById('profile-select');
+            selectEl.innerHTML = '<option value="">-- Seleccionar Perfil --</option>';
+
+            window.profiles.forEach(profile => {
+                const option = document.createElement('option');
+                option.value = profile.id;
+                option.textContent = profile.name || 'Perfil sin nombre';
+                selectEl.appendChild(option);
+            });
+        }
+
+        /**
+         * Guarda el perfil de simulación actual en Firestore.
+         */
+        window.saveProfile = async function() {
+            if (!window.db || !window.userId) {
+                showModal('Error de Autenticación', 'Debe estar autenticado para guardar perfiles.');
+                return;
+            }
+
+            const profileNameInput = document.getElementById('profile-name');
+            const name = profileNameInput.value.trim();
+
+            if (!name) {
+                showModal('Nombre Requerido', 'Por favor, ingrese un nombre para guardar el perfil.');
+                return;
+            }
+
+            // Recoger todos los datos del formulario (Actualizado v4)
+            const data = {
+                name: name,
+                billingDays: parseFloat(document.getElementById('billing-days').value) || 30,
+                meterRentalDaily: parseFloat(document.getElementById('meter-rental-daily').value) || 0,
+                fixedMonthlyFee: parseFloat(document.getElementById('fixed-monthly-fee').value) || 0,
+                
+                contractedPowerP1: parseFloat(document.getElementById('contracted-power-p1').value) || 0,
+                powerPriceDailyP1: parseFloat(document.getElementById('power-price-daily-p1').value) || 0,
+                contractedPowerP2: parseFloat(document.getElementById('contracted-power-p2').value) || 0,
+                powerPriceDailyP2: parseFloat(document.getElementById('power-price-daily-p2').value) || 0,
+                
+                consumptionPunta: parseFloat(document.getElementById('consumption-punta').value) || 0,
+                pricePunta: parseFloat(document.getElementById('price-punta').value) || 0,
+                consumptionLlano: parseFloat(document.getElementById('consumption-llano').value) || 0,
+                priceLlano: parseFloat(document.getElementById('price-llano').value) || 0,
+                consumptionValle: parseFloat(document.getElementById('consumption-valle').value) || 0,
+                priceValle: parseFloat(document.getElementById('price-valle').value) || 0,
+
+                socialBonoDiscountRate: parseFloat(document.getElementById('social-bono-discount-rate').value) || 0,
+                socialBonoFinancingRate: parseFloat(document.getElementById('social-bono-financing-rate').value) || 0, // Nuevo
+                
+                electricityTaxRate: parseFloat(document.getElementById('electricity-tax-rate').value) || 0,
+                vatRate: parseFloat(document.getElementById('vat-rate').value) || 0,
+                createdBy: window.userId,
+                createdAt: new Date().toISOString()
+            };
+
+            try {
+                const collectionPath = `artifacts/${appId}/public/data/bill_profiles`;
+                // Intenta encontrar un perfil existente con el mismo nombre y actualizarlo
+                const existingProfile = window.profiles.find(p => p.name === name);
+
+                if (existingProfile) {
+                    const docRef = doc(window.db, collectionPath, existingProfile.id);
+                    await setDoc(docRef, data, { merge: true });
+                    document.getElementById('load-save-status').textContent = `Perfil "${name}" actualizado.`;
+                } else {
+                    await addDoc(collection(window.db, collectionPath), data);
+                    document.getElementById('load-save-status').textContent = `Perfil "${name}" guardado exitosamente.`;
+                }
+                profileNameInput.value = ''; // Limpiar el nombre después de guardar
+            } catch (error) {
+                console.error("Error al guardar perfil:", error);
+                showModal('Error al Guardar', 'No se pudo guardar el perfil. Revise la consola.');
+            }
+        }
+
+        /**
+         * Carga el perfil de simulación seleccionado.
+         */
+        window.loadProfile = function() {
+            const selectEl = document.getElementById('profile-select');
+            const profileId = selectEl.value;
+
+            if (!profileId) {
+                showModal('Selección Requerida', 'Por favor, seleccione un perfil para cargar.');
+                return;
+            }
+
+            const profile = window.profiles.find(p => p.id === profileId);
+
+            if (profile) {
+                // Rellenar todos los campos del formulario (Actualizado v4)
+                document.getElementById('billing-days').value = profile.billingDays || 30;
+                document.getElementById('meter-rental-daily').value = profile.meterRentalDaily || 0;
+                document.getElementById('fixed-monthly-fee').value = profile.fixedMonthlyFee || 0;
+
+                document.getElementById('contracted-power-p1').value = profile.contractedPowerP1 || 0;
+                document.getElementById('power-price-daily-p1').value = profile.powerPriceDailyP1 || 0;
+                document.getElementById('contracted-power-p2').value = profile.contractedPowerP2 || 0;
+                document.getElementById('power-price-daily-p2').value = profile.powerPriceDailyP2 || 0;
+                
+                document.getElementById('consumption-punta').value = profile.consumptionPunta || 0;
+                document.getElementById('price-punta').value = profile.pricePunta || 0;
+                document.getElementById('consumption-llano').value = profile.consumptionLlano || 0;
+                document.getElementById('price-llano').value = profile.priceLlano || 0;
+                document.getElementById('consumption-valle').value = profile.consumptionValle || 0;
+                document.getElementById('price-valle').value = profile.priceValle || 0;
+                
+                document.getElementById('social-bono-discount-rate').value = profile.socialBonoDiscountRate || 0;
+                document.getElementById('social-bono-financing-rate').value = profile.socialBonoFinancingRate || 0; // Nuevo
+
+                document.getElementById('electricity-tax-rate').value = profile.electricityTaxRate || 0;
+                document.getElementById('vat-rate').value = profile.vatRate || 0;
+
+                document.getElementById('load-save-status').textContent = `Perfil "${profile.name}" cargado.`;
+                document.getElementById('profile-name').value = profile.name;
+            } else {
+                showModal('Error de Carga', 'Perfil no encontrado.');
+            }
+        }
+
+        // Inicializar Firebase al cargar la página
+        initFirebase();
+    </script>
+
+    <script>
+        /**
+         * Muestra el modal de mensajes/errores.
+         * @param {string} title Título del modal.
+         * @param {string} message Mensaje a mostrar.
+         */
+        function showModal(title, message) {
+            document.getElementById('modal-title').textContent = title;
+            document.getElementById('modal-message').textContent = message;
+            document.getElementById('message-modal').classList.remove('hidden');
+            document.getElementById('message-modal').classList.add('flex');
+        }
+
+        /**
+         * Cierra el modal.
+         */
+        window.closeModal = function() {
+            document.getElementById('message-modal').classList.add('hidden');
+            document.getElementById('message-modal').classList.remove('flex');
+        }
+
+        /**
+         * Realiza el cálculo completo de la factura.
+         */
+        window.calculateBill = function() {
+            // 1. Recolección de datos
+            const billingDays = parseFloat(document.getElementById('billing-days').value);
+            const meterRentalDaily = parseFloat(document.getElementById('meter-rental-daily').value);
+            const fixedMonthlyFee = parseFloat(document.getElementById('fixed-monthly-fee').value); 
+
+            // Potencia
+            const contractedPowerP1 = parseFloat(document.getElementById('contracted-power-p1').value);
+            const powerPriceDailyP1 = parseFloat(document.getElementById('power-price-daily-p1').value);
+            const contractedPowerP2 = parseFloat(document.getElementById('contracted-power-p2').value);
+            const powerPriceDailyP2 = parseFloat(document.getElementById('power-price-daily-p2').value);
+
+            // Consumo y Precios
+            const consumptionPunta = parseFloat(document.getElementById('consumption-punta').value);
+            const pricePunta = parseFloat(document.getElementById('price-punta').value);
+            const consumptionLlano = parseFloat(document.getElementById('consumption-llano').value);
+            const priceLlano = parseFloat(document.getElementById('price-llano').value);
+            const consumptionValle = parseFloat(document.getElementById('consumption-valle').value);
+            const priceValle = parseFloat(document.getElementById('price-valle').value);
+
+            // Descuentos, Cargos e Impuestos
+            const socialBonoDiscountRate = parseFloat(document.getElementById('social-bono-discount-rate').value) / 100;
+            const socialBonoFinancingRate = parseFloat(document.getElementById('social-bono-financing-rate').value); // Nuevo
+            const electricityTaxRate = parseFloat(document.getElementById('electricity-tax-rate').value) / 100;
+            const vatRate = parseFloat(document.getElementById('vat-rate').value) / 100;
+
+            // Validación básica
+            if (isNaN(billingDays) || billingDays <= 0 || isNaN(electricityTaxRate) || isNaN(vatRate)) {
+                showModal('Error de Datos', 'Por favor, ingrese valores numéricos válidos en los campos principales.');
+                return;
+            }
+
+            // --- CÁLCULOS PRINCIPALES ---
+
+            // 2. Cálculo del Término de Potencia (Fijo - P1 y P2)
+            const powerTermP1 = contractedPowerP1 * powerPriceDailyP1 * billingDays;
+            const powerTermP2 = contractedPowerP2 * powerPriceDailyP2 * billingDays;
+            const powerTerm = powerTermP1 + powerTermP2;
+
+            let powerBreakdownHTML = `
+                <div class="flex justify-between items-center text-sm text-red-600">
+                    <span>P1 Punta (${contractedPowerP1.toFixed(2)} kW @ ${powerPriceDailyP1.toFixed(6)} €/kW/día):</span>
+                    <span class="font-mono font-medium">${powerTermP1.toFixed(2)} €</span>
+                </div>
+                <div class="flex justify-between items-center text-sm text-green-600">
+                    <span>P2 Valle (${contractedPowerP2.toFixed(2)} kW @ ${powerPriceDailyP2.toFixed(6)} €/kW/día):</span>
+                    <span class="font-mono font-medium">${powerTermP2.toFixed(2)} €</span>
+                </div>
+            `;
+
+            // 3. Otros Costes Fijos (Alquiler + Cuota Fija Adicional)
+            const meterRentalTerm = meterRentalDaily * billingDays;
+            const proratedFixedFee = fixedMonthlyFee * (billingDays / 30.42); // Prorrateo usando días del mes (aprox.)
+            const fixedCharges = powerTerm + proratedFixedFee;
+
+            // 4. Cálculo del Término de Energía (Variable - P1, P2 y P3)
+            const costPunta = consumptionPunta * pricePunta;
+            const costLlano = consumptionLlano * priceLlano;
+            const costValle = consumptionValle * priceValle;
+
+            const energyTerm = costPunta + costLlano + costValle;
+            const totalConsumption = consumptionPunta + consumptionLlano + consumptionValle;
+
+            const energyBreakdownHTML = `
+                <div class="space-y-1 text-sm">
+                    <div class="flex justify-between items-center text-red-600">
+                        <span>P1 Punta (${consumptionPunta.toFixed(0)} kWh @ ${pricePunta.toFixed(3)} €/kWh):</span>
+                        <span class="font-mono font-medium">${costPunta.toFixed(2)} €</span>
+                    </div>
+                    <div class="flex justify-between items-center text-orange-600">
+                        <span>P2 Llano (${consumptionLlano.toFixed(0)} kWh @ ${priceLlano.toFixed(3)} €/kWh):</span>
+                        <span class="font-mono font-medium">${costLlano.toFixed(2)} €</span>
+                    </div>
+                    <div class="flex justify-between items-center text-green-600">
+                        <span>P3 Valle (${consumptionValle.toFixed(0)} kWh @ ${priceValle.toFixed(3)} €/kWh):</span>
+                        <span class="font-mono font-medium">${costValle.toFixed(2)} €</span>
+                    </div>
+                </div>
+            `;
+            
+            // 5. Coste de Financiación del Bono Social (basado en días)
+            const socialBonoFinancingCost = billingDays * socialBonoFinancingRate;
+
+            // 6. Base para Descuento (Potencia + Otros Fijos + Energía + Financiación BS)
+            // Nota: En la práctica, el descuento (si aplica) puede ir solo sobre la energía, pero aquí se aplica sobre la base total para mayor generalidad.
+            const baseForDiscount = fixedCharges + energyTerm + socialBonoFinancingCost;
+
+            // 7. Descuento Bono Social (Se aplica a la Base para Descuento)
+            const socialBonoDiscount = (fixedCharges + energyTerm) * socialBonoDiscountRate; // Se aplica sobre Potencia + Energía + Fijos, sin la financiación BS (que es un cargo obligatorio)
+
+            // 8. Base Imponible (Base - Descuento)
+            const baseImponible = (fixedCharges + energyTerm + socialBonoFinancingCost) - socialBonoDiscount;
+
+            // 9. Impuesto Electricidad (IE)
+            const electricityTax = baseImponible * electricityTaxRate;
+            const subtotalTaxBase = baseImponible + electricityTax + meterRentalTerm;
+
+            // 10. IVA/IGIC
+            const vat = subtotalTaxBase * vatRate;
+
+            // 11. TOTAL
+            const totalBill = subtotalTaxBase + vat;
+
+            // --- ACTUALIZACIÓN DE LA INTERFAZ ---
+            document.getElementById('results-section').classList.remove('hidden');
+
+            // Actualizaciones del resumen y totales
+            document.getElementById('billing-days-summary').textContent = billingDays.toFixed(0);
+            document.getElementById('rental-days-summary').textContent = billingDays.toFixed(0);
+            document.getElementById('total-consumption-display').textContent = totalConsumption.toFixed(0);
+            document.getElementById('total-bill-display').textContent = totalBill.toFixed(2) + ' €';
+            document.getElementById('total-bill-final-display').textContent = totalBill.toFixed(2) + ' €';
+
+            // Término de Potencia
+            document.getElementById('power-term-display').textContent = powerTerm.toFixed(2) + ' €';
+            document.getElementById('power-breakdown').innerHTML = powerBreakdownHTML;
+
+            // Otros Costes Fijos
+            document.getElementById('meter-rental-display').textContent = meterRentalTerm.toFixed(2) + ' €';
+            document.getElementById('fixed-fee-display').textContent = proratedFixedFee.toFixed(2) + ' €';
+
+            // Término de Energía
+            document.getElementById('energy-term-display').textContent = energyTerm.toFixed(2) + ' €';
+            document.getElementById('energy-breakdown').innerHTML = energyBreakdownHTML;
+            
+            // Descuento Bono Social
+            document.getElementById('social-bono-rate-display').textContent = (socialBonoDiscountRate * 100).toFixed(0);
+            document.getElementById('social-bono-discount-display').textContent = '-' + socialBonoDiscount.toFixed(2) + ' €';
+
+            // Financiación Bono Social (Cargo)
+            document.getElementById('financing-rate-display').textContent = socialBonoFinancingRate.toFixed(5);
+            document.getElementById('social-bono-financing-display').textContent = socialBonoFinancingCost.toFixed(2) + ' €';
+
+            // Impuestos
+            document.getElementById('elec-tax-rate-display').textContent = (electricityTaxRate * 100).toFixed(3);
+            document.getElementById('vat-rate-display').textContent = (vatRate * 100).toFixed(1);
+            document.getElementById('base-imponible-display').textContent = baseImponible.toFixed(2) + ' €';
+            document.getElementById('electricity-tax-display').textContent = electricityTax.toFixed(2) + ' €';
+            document.getElementById('subtotal-tax-base-display').textContent = subtotalTaxBase.toFixed(2) + ' €';
+            document.getElementById('vat-display').textContent = vat.toFixed(2) + ' €';
+        }
+    </script>
+</body>
+</html>

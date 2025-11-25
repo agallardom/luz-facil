@@ -1,0 +1,14 @@
+/venv
+/.env
+/env
+pycache/
+*.pyc
+*.egg-info/
+/build
+/target
+/dist
+*.log
+*.tmp
+.vscode/
+.idea/
+token

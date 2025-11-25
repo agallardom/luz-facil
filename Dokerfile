@@ -1,0 +1,22 @@
+# Usa una imagen base oficial de Python
+FROM python:3.11-slim
+
+# Establece el directorio de trabajo dentro del contenedor
+WORKDIR /usr/src/app
+
+# Copia los archivos de dependencia y luego instala las dependencias.
+# Esto mejora el caching de Docker.
+COPY requirements.txt ./
+RUN pip install --no-cache-dir -r requirements.txt
+
+# Copia el resto del código de la aplicación al directorio de trabajo
+COPY app.py ./
+
+# Expón el puerto 8000 (Gunicorn a menudo usa este puerto por defecto, 
+# aunque Render usará la variable de entorno $PORT)
+EXPOSE 8000
+
+# Comando para ejecutar la aplicación usando Gunicorn.
+# Usa la variable de entorno $PORT para la configuración de Render.
+# 'app:app' significa que la aplicación Flask se llama 'app' y está en el archivo 'app.py'
+CMD exec gunicorn --bind 0.0.0.0:${PORT:-8000} --workers 1 app:app
