@@ -5,11 +5,7 @@ from flask_cors import CORS # Necesario para permitir llamadas desde el frontend
 
 app = Flask(__name__)
 # Habilita CORS para permitir llamadas desde cualquier origen (tu HTML)
-CORS(app, origins=[
-    "https://angelgallardo.com.es", # Tu dominio real
-    "http://localhost:8000",        # Para pruebas locales
-    "*"                             # Wildcard por si acaso Render usa un proxy
-])
+CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Constante para el cálculo del prorrateo de la cuota fija
 DAYS_IN_MONTH_AVG = 30.42
@@ -241,5 +237,5 @@ def calculate_bill():
 if __name__ == '__main__':
     # Configuración de puerto para Render (puede ser necesario)
     import os
-    port = int(os.environ.get("PORT", 5000))
+    port = int(os.environ.get("PORT", 10000))
     app.run(host='0.0.0.0', port=port)
