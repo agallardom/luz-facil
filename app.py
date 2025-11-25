@@ -5,7 +5,11 @@ from flask_cors import CORS # Necesario para permitir llamadas desde el frontend
 
 app = Flask(__name__)
 # Habilita CORS para permitir llamadas desde cualquier origen (tu HTML)
-CORS(app)
+CORS(app, origins=[
+    "https://angelgallardo.com.es", # Tu dominio real
+    "http://localhost:8000",        # Para pruebas locales
+    "*"                             # Wildcard por si acaso Render usa un proxy
+])
 
 # Constante para el cálculo del prorrateo de la cuota fija
 DAYS_IN_MONTH_AVG = 30.42
